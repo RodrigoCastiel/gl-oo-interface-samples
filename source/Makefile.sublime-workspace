@@ -1,0 +1,269 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"mH",
+				"mHasTexCoord"
+			],
+			[
+				"mHas",
+				"mHasColors"
+			],
+			[
+				"mHe",
+				"mHeight"
+			],
+			[
+				"mW",
+				"mWidth"
+			],
+			[
+				"tar",
+				"mTargetJ"
+			],
+			[
+				"mTarge",
+				"mTargetI"
+			],
+			[
+				"Compu",
+				"ComputeReward"
+			],
+			[
+				"mTa",
+				"mTargetJ"
+			],
+			[
+				"mTar",
+				"mTargetI"
+			],
+			[
+				"rO",
+				"RobotAction"
+			],
+			[
+				"mU",
+				"mPrevUtility"
+			],
+			[
+				"max",
+				"max_u"
+			],
+			[
+				"to",
+				"top_u"
+			],
+			[
+				"bo",
+				"bot_u"
+			],
+			[
+				"h",
+				"h"
+			],
+			[
+				"ob",
+				"obstacle"
+			],
+			[
+				"o",
+				"obstacle"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 404.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/openGLHelper-starterCode/pipelineProgram.cpp",
+		"/Users/rodrigocastiel/itp435-20161/pa4/AminoHistTool.cpp",
+		"/Users/rodrigocastiel/itp435-20161/pa4/AminoHistTool.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/camera.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/glut_program.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/sample_program.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/light.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/mesh.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/basic_obj_library.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/object.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/scene_object.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/scene.h",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/sample_program.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/objs/A380.obj",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/Makefile",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/objs/dragon-77k.obj",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/Makefile",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/MDP.cpp",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/MDP.h",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/main.cpp",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/Project3.cpp",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/Project3.h",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/Simulator.h",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/Vector2D.h",
+		"/Users/rodrigocastiel/Desktop/USC/Spring 2016/CSCI360/Assignments/Project3/MarkovGraph.h",
+		"/Users/rodrigocastiel/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/Users/rodrigocastiel/Desktop/blah.html",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/scene.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/object.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/mesh.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/main.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/light.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/glut_program.cpp",
+		"/Users/rodrigocastiel/Documents/github/sample-gl-oo-interface/source/camera.cpp"
+	],
+	"find":
+	{
+		"height": 22.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"vt",
+			"VN",
+			"y"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 21.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "Makefile.sublime-project",
+	"replace":
+	{
+		"height": 40.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 229.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
