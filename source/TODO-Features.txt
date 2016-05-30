@@ -1,0 +1,22 @@
+-- General --
+1. Add "class Renderer";
+2. Terrain class;
+3.
+
+-- Object --
+1. Provide basic objects, such as spheres tetrahedron, rectangles with texture and so on;
+2. Take object out from namespace obj;
+3. Provide wireframe mesh to any object (like a copy);
+4.  
+
+-- Scene --
+1. Allow multiple object;
+2. Data structures for storing objects in an efficient way;
+3. 
+
+-- Rendering --
+MAIN: create renderer to frame buffer;
+1. Shadow mapping;
+2. Bump mapping;
+3. Basic reflection to texture;
+4. Post-rendering effects (image processing);
