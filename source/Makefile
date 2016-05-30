@@ -1,4 +1,4 @@
-LIB_CODE_BASE=../openGLHelper-starterCode
+LIB_CODE_BASE=../external/support
 
 HW2_CXX_SRC=main.cpp video_recorder.cpp light.cpp scene.cpp scene_object.cpp object.cpp mesh.cpp camera.cpp glut_program.cpp sample_program.cpp basic_obj_library.cpp utilities.cpp
 HW2_HEADER=video_recorder.h light.h camera.h glut_program.h sample_program.h mesh.h scene_object.h object.h scene.h basic_obj_library.h utilities.h

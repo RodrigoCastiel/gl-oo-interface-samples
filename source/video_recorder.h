@@ -33,5 +33,4 @@ private:
 
   // NOTE: This method was adapted from "saveScreenshot" function provided in starter code.
   void SaveScreenshot(const std::string& filename = "screenshot.jpg");
-
 };

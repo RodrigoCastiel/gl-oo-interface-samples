@@ -37,7 +37,7 @@ void VideoRecorder::Update()
   if ((mIsRecording) && (mCurrentFrame%5 == 1))
   {
     char name[30];
-    sprintf(name, "videos/%03d.jpg", mCurrentFrame/5);
+    sprintf(name, "videos/frame_%02d_%03d.jpg", mCurrentVideoID, mCurrentFrame);
     VideoRecorder::SaveScreenshot(name);
   }
   mCurrentFrame++;
