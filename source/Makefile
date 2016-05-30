@@ -24,13 +24,13 @@ UNAME_S=$(shell uname -s)
 
 ifeq ($(UNAME_S),Linux)
   PLATFORM=Linux
-  INCLUDE=-I../external/glm/ -I$(LIB_CODE_BASE) #-I../external/imageIO -I../external/VegaFEM-v2.2/
-  LIB=-lGLEW -lGL -lglut -ljpeg #-../external/VegaFEM-v2.2/minivector/libminivector.a
+  INCLUDE=-I../external/glm/ -I$(LIB_CODE_BASE) -I../external/assimp-3.2/include #-I../external/imageIO 
+  LIB=-lGLEW -lGL -lglut -ljpeg 
   LDFLAGS=
 else
   PLATFORM=Mac OS
-  INCLUDE=-I../external/glm/ -I$(LIB_CODE_BASE) -I../external/imageIO -I../external/jpeg-9a-mac/include #-I../external/VegaFEM-v2.2/minivector -I../external/VegaFEM-v2.2/objMesh
-  LIB=-framework OpenGL -framework GLUT ../external/jpeg-9a-mac/lib/libjpeg.a #../external/VegaFEM-v2.2/minivector/libminivector.a ../external/VegaFEM-v2.2/objMesh/libobjMesh.a
+  INCLUDE=-I../external/glm/ -I$(LIB_CODE_BASE) -I../external/imageIO -I../external/jpeg-9a-mac/include -I../external/assimp-3.2/include 
+  LIB=-framework OpenGL -framework GLUT ../external/jpeg-9a-mac/lib/libjpeg.a ../external/assimp-3.2/lib/libassimp.3.2.0.dylib
   CXXFLAGS+= -Wno-deprecated-declarations
   LDFLAGS=-Wl,-w
 endif

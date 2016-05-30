@@ -92,8 +92,8 @@ public:
   // Improved .obj loading method.
   bool LoadObjFile(const std::string& objFilePath, ShadingType shadingType = kFlat);
 
-  // .obj Load method - must be called after constructor to initialize everything;
-  bool Load(const std::string& objFilePath);
+  // assimp loading method - works with any kind of 3d model file.
+  bool Load(const std::string& filePath, ShadingType shadingType);
 
   // Loads its mesh from a parametric surface, surf : R^2 -> R^3.
   // Parameterization must be normalized from 0 to 1. 
@@ -123,7 +123,8 @@ private:
   void BuildUpGroup(std::vector<GLfloat>& groupPositions, 
                     std::vector<GLfloat>& groupTexCoords, 
                     std::vector<GLfloat>& groupNormals,
-                    const char* name);
+                    std::vector<GLuint>& groupIndices,
+                    const char* name, int materialIndex = -1);
 
   BasicPipelineProgram* mPipelineProgram { nullptr };
   GLuint mProgramHandle { 0 };
@@ -132,8 +133,8 @@ private:
   std::vector<Group> mGroups;        // List of groups that share the same material.
   std::vector<Material> mMaterials;  // Material library.
 
-  bool mOwnsData      { true };      // Tells whether the object has the original data (for copies).
-  bool mUsingLighting { true };      // Tells if the object is using Phong shading model.
+  bool mOwnsData      { true };       // Tells whether the object has the original data (for copies).
+  bool mUsingLighting { true };       // Tells if the object is using Phong shading model.
   mutable OpenGLMatrix mModelMatrix;  // It is an auxiliar object to handle transforms.
 
   glm::vec3 mPos    {0.0f, 0.0f, 0.0f};    // Center    (x, y, z).
@@ -141,6 +142,8 @@ private:
   glm::vec3 mScale  {1.0f, 1.0f, 1.0f};    // Scaling parameters.
   
 };  // class Object
+
+
 
 // ============================================================================================= //
 

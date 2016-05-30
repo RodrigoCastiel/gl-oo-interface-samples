@@ -36,9 +36,10 @@ void SampleProgram::InitScene(int argc, char *argv[])
   mScene->Init(mPipelineProgram, mProgramHandle);
 
   blah = new obj::Object(mPipelineProgram, mProgramHandle);
-  blah->SetRotation(-M_PI/2, 0, 0);
-  blah->SetScale(0.01, 0.01, 0.01);
-  blah->LoadObjFile("./objs/A380.obj");
+  //blah->SetRotation(-M_PI/2, 0, 0);
+  //blah->SetScale(0.01, 0.01, 0.01);
+  //blah->Load("./objs/dragon-77k.obj", gloo::obj::Object::kSmooth);
+  blah->LoadObjFile("./objs/dragon-77k.obj");
 
   // Insert new objects here!!
   AxisObject* originAxis = new AxisObject(mPipelineProgram, mProgramHandle);
