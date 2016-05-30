@@ -67,12 +67,8 @@ void Object::BuildUpGroup(std::vector<GLfloat>& groupPositions,
                (groupNormals.size() != 0)   ? &groupNormals[0]   : nullptr,     // Normals
                (groupTexCoords.size() != 0) ? &groupTexCoords[0] : nullptr,     // Texture coords.
                (groupIndices.size() != 0)   ? &groupIndices[0]   : nullptr,     // Indices.
-               groupPositions.size()/3, groupIndices.size(), GL_POINTS, Mesh::kSubBuffered
+               groupPositions.size()/3, groupIndices.size(), GL_TRIANGLES, Mesh::kSubBuffered
             );
-
-  std::cout << "Number of vertices: " << groupPositions.size() << "\n";
-  std::cout << "Number of normals:  " << groupNormals.size()   << "\n";
-  std::cout << "Number of indices:  " << groupIndices.size()   << "\n";
 
   mGroups.emplace_back(mesh, materialIndex, name);
 }
@@ -351,7 +347,7 @@ bool Object::Load(const std::string& filePath, ShadingType shadingType)
       aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
 
   // If successfully loaded into scene...
-  if (scene)
+  if (scene != nullptr)
   {
     // For each mesh, create a group.
     for (int i = 0; i < scene->mNumMeshes; i++)
@@ -365,9 +361,9 @@ bool Object::Load(const std::string& filePath, ShadingType shadingType)
       // Save vertices into temporary arrays.
       for (int j = 0; j < mesh->mNumVertices; j++)
       {
-        const aiVector3D* pos = &(mesh->mVertices[i]);
-        const aiVector3D* nor = mesh->HasNormals() ? &(mesh->mNormals[i]) : nullptr;
-        const aiVector3D* tex = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][i]) : nullptr;
+        const aiVector3D* pos = &(mesh->mVertices[j]);
+        const aiVector3D* nor = mesh->HasNormals() ? &(mesh->mNormals[j]) : nullptr;
+        const aiVector3D* tex = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][j]) : nullptr;
 
         groupPositions.push_back(pos->x);
         groupPositions.push_back(pos->y);
@@ -388,7 +384,7 @@ bool Object::Load(const std::string& filePath, ShadingType shadingType)
       }
 
       for (unsigned int j = 0 ; j < mesh->mNumFaces ; j++) {
-        const aiFace& face = mesh->mFaces[i];
+        const aiFace& face = mesh->mFaces[j];
         groupIndices.push_back(face.mIndices[0]);
         groupIndices.push_back(face.mIndices[1]);
         groupIndices.push_back(face.mIndices[2]);
@@ -405,7 +401,7 @@ bool Object::Load(const std::string& filePath, ShadingType shadingType)
   }
   else
   {
-    std::cerr << "ERROR Unsuccessful parsing of " << filePath << "\n" << importer.GetErrorString();
+    std::cerr << "ERROR Couldn't load scene/mesh at " << filePath << "\n" << importer.GetErrorString();
     return false;
   }
 }
