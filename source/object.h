@@ -94,10 +94,10 @@ public:
   // numSampleU and numSampleV detail how many samples of u, v are taken.
   // WIREFRAME - constant color.
   bool Load(std::function<glm::vec3 (float, float)> surf, 
-    int numSampleU, int numSampleV, const glm::vec3& rgb = {0.6f, 0.6f, 0.6f});
+      int numSampleU, int numSampleV, const glm::vec3& rgb = {0.6f, 0.6f, 0.6f});
   // WIREFRAME - variable color according to rgb lambda function.
-  bool Load(std::function<glm::vec3 (float, float)> surf, 
-    int numSampleU, int numSampleV, std::function<glm::vec3 (float, float)> rgbFunc );
+  bool Load(std::function<glm::vec3 (float, float)> surf, int numSampleU, int numSampleV, 
+      std::function<glm::vec3 (float, float)> rgbFunc, bool solid = false);
 
   // Loads its mesh from a parametric surface, surf : R^2 -> R^3.
   // Parameterization must be normalized from 0 to 1.

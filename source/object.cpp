@@ -414,19 +414,19 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
   return true;
 }
 
-bool Object::Load(std::function<glm::vec3 (float, float)> surf, 
-    int numSampleU, int numSampleV, std::function<glm::vec3 (float, float)> rgbFunc )
+bool Object::Load(std::function<glm::vec3 (float, float)> surf, int numSampleU, int numSampleV, 
+    std::function<glm::vec3 (float, float)> rgbFunc, bool solid)
 {
   int w = numSampleU;
   int h = numSampleV;
   int numVertices = (w * h);
-  int numIndices  = (2 * w * h);
+  int numIndices = 0;
+  GLenum drawMode = GL_LINE_STRIP;
 
   std::vector<GLfloat> vertices;
-  std::vector<GLuint> indices; 
+  std::vector<GLuint> indices;
 
   vertices.reserve(numVertices * 6);
-  indices.reserve(numIndices);
 
   // Initialize vertices.
   for (int y = 0; y < h; y++)
@@ -451,40 +451,92 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
     }
   }
 
+  
   // Initialize indices.
-  // Wire frame Element array - indices are written in a zig-zag pattern,
-  // first horizontally and then vertically. It uses GL_LINE_STRIP. 
-  int index = 0;
-  int x = 0, y = 0;
-  int dx = 1, dy = -1;
-
-  for (y = 0; y < h; y++)  // Horizontally.
+  if (!solid)  // WIREFRAME.
   {
+    numIndices  = (2 * w * h);
+    indices.reserve(numIndices);
+    
+    // Wire frame Element array - indices are written in a zig-zag pattern,
+    // first horizontally and then vertically. It uses GL_LINE_STRIP. 
+    int index = 0;
+    int x = 0, y = 0;
+    int dx = 1, dy = -1;
+
+    for (y = 0; y < h; y++)  // Horizontally.
+    {
+      x = ((dx == 1) ? 0 : w-1);
+      for (int k = 0; k < w; k++, x += dx)
+        indices.push_back(INDEX(x, y));
+      dx *= -1;
+    }
+
+    // Start from the last point to allow continuity in GL_LINE_STRIP.
     x = ((dx == 1) ? 0 : w-1);
-    for (int k = 0; k < w; k++, x += dx)
-      indices.push_back(INDEX(x, y));
-    dx *= -1;
+    y = h-1;  
+    dy = -1;
+    for (int i = 0; i < w; i++, x += dx)  // Vertically.
+    {
+      y = ((dy == 1) ? 0 : h-1);
+      for (int j = 0; j < h; j++, y += dy)
+        indices.push_back(INDEX(x, y));
+      dy *= -1;
+    }
   }
-
-  // Start from the last point to allow continuity in GL_LINE_STRIP.
-  x = ((dx == 1) ? 0 : w-1);
-  y = h-1;  
-  dy = -1;
-  for (int i = 0; i < w; i++, x += dx)  // Vertically.
+  else  // SOLID.
   {
-    y = ((dy == 1) ? 0 : h-1);
-    for (int j = 0; j < h; j++, y += dy)
-      indices.push_back(INDEX(x, y));
-    dy *= -1;
+    numIndices  = 2*(h-2)*w + 2*w + 2*(h-2);
+    indices.reserve(numIndices);
+    drawMode = GL_TRIANGLE_STRIP;
+
+    for (int v = 0; v < h-1; v++)
+    {
+      // Zig-zag pattern: alternate between top and bottom.
+      for (int u = 0; u < w; u++)
+      {
+        indices.push_back((v+0)*w + u);
+        indices.push_back((v+1)*w + u);
+      }
+
+      // Triangle row transition: handle discontinuity.
+      if (v < h-2)
+      {
+        // Repeat last vertex and the next row first vertex to generate 
+        // two invalid triangles and get continuity in the mesh.
+        indices.push_back((v+1)*w + (w-1)); //INDEX(this->width-1, y+1);
+        indices.push_back((v+1)*w + 0);     //INDEX(0, y+1);
+      }
+    }
   }
 
   Mesh* mesh = new Mesh(mProgramHandle);
-  mesh->Load(&vertices[0], &indices[0], numVertices, numIndices, true, false, false, GL_LINE_STRIP);
+  mesh->Load(&vertices[0], &indices[0], numVertices, numIndices, true, false, false, drawMode);
   mUsingLighting = false;
   mGroups.emplace_back(mesh, 0, "Main surface");
 
   return true;
 }
+
+// // Initialize indices.
+//   for (int v = 0; v < h-1; v++)
+//   {
+//     // Zig-zag pattern: alternate between top and bottom.
+//     for (int u = 0; u < n; u++)
+//     {
+//       indices.push_back((v+0)*n + u);
+//       indices.push_back((v+1)*n + u);
+//     }
+
+//     // Triangle row transition: handle discontinuity.
+//     if (v < h-2)
+//     {
+//       // Repeat last vertex and the next row first vertex to generate 
+//       // two invalid triangles and get continuity in the mesh.
+//       indices.push_back((v+1)*n + (n-1)); //INDEX(this->width-1, y+1);
+//       indices.push_back((v+1)*n + 0);     //INDEX(0, y+1);
+//     }
+//   }
 
 // ================= Ray Intersection =============== //
 

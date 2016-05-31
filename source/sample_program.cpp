@@ -45,7 +45,7 @@ void SampleProgram::InitScene(int argc, char *argv[])
   //blah->SetScale(0.01, 0.01, 0.01);
   //blah->Load("./objs/B-747.obj", true);
   //blah->LoadObjFile("./objs/dragon-77k.obj");
-  blah->Load(mobius, 50, 50, mobiusColor);
+  blah->Load(mobius, 50, 50, mobiusColor, true);
 
   // Insert new objects here!!
   AxisObject* originAxis = new AxisObject(mPipelineProgram, mProgramHandle);
