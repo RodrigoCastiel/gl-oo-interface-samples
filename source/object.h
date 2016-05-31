@@ -74,12 +74,6 @@ public:
     int materialIndex;  // Index for the list of materials.
   };
 
-  enum ShadingType
-  {
-    kSmooth,
-    kFlat
-  };
-
   // 
   Object(BasicPipelineProgram* pipelineProgram, GLuint programHandle)
   : mPipelineProgram(pipelineProgram), mProgramHandle(programHandle)
@@ -90,17 +84,19 @@ public:
   void Render() const;
 
   // Improved .obj loading method.
-  bool LoadObjFile(const std::string& objFilePath, ShadingType shadingType = kFlat);
+  bool LoadObjFile(const std::string& objFilePath, bool smoothNormals);
 
-  // assimp loading method - works with any kind of 3d model file.
-  bool Load(const std::string& filePath, ShadingType shadingType);
+  // ASSIMP loading method - works with any kind of 3d model file.
+  bool Load(const std::string& filePath, bool smoothNormals);
 
   // Loads its mesh from a parametric surface, surf : R^2 -> R^3.
   // Parameterization must be normalized from 0 to 1. 
   // numSampleU and numSampleV details how many samples of u, v are taken.
   bool Load(std::function<glm::vec3 (float, float)> surf, int numSampleU, int numSampleV);
 
-  // Computes intersection of C + tRay with geometry.
+  // TODO: Add primitive loading method here.
+
+  // Computes intersection of C + t*Ray with geometry.
   bool IntersectRay(const glm::vec3& ray, const glm::vec3& C) const;
 
   // Getter and setters.

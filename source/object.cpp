@@ -73,7 +73,7 @@ void Object::BuildUpGroup(std::vector<GLfloat>& groupPositions,
   mGroups.emplace_back(mesh, materialIndex, name);
 }
 
-bool Object::LoadObjFile(const std::string& objFilePath, ShadingType shadingType)
+bool Object::LoadObjFile(const std::string& objFilePath, bool smoothNormals)
 {
   std::ifstream input(objFilePath, std::ios::in);
 
@@ -248,7 +248,7 @@ bool Object::LoadObjFile(const std::string& objFilePath, ShadingType shadingType
         currentVertex++;
       }
 
-      if (shadingType == kFlat)
+      if (!smoothNormals)
       {
         // Compute normal per triangle.
         glm::vec3 n = tool::TriangleNormal(faceVertices[0], faceVertices[1], faceVertices[2]);
@@ -339,12 +339,15 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
 }
 
 // assimp loading method - works with any kind of 3d model file.
-bool Object::Load(const std::string& filePath, ShadingType shadingType)
+bool Object::Load(const std::string& filePath, bool smoothNormals)
 {
   // Load using Assimp::Importer.
   Assimp::Importer importer;
+  aiPostProcessSteps postProcessNormal 
+      = smoothNormals ? aiProcess_GenSmoothNormals : aiProcess_GenNormals;
+
   const aiScene* scene = importer.ReadFile(filePath.c_str(), 
-      aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs);
+      aiProcess_Triangulate | postProcessNormal | aiProcess_FlipUVs);
 
   // If successfully loaded into scene...
   if (scene != nullptr)
