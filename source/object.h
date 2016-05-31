@@ -101,11 +101,15 @@ public:
 
   // Getter and setters.
   void SetDataOwner(bool isOwner) { mOwnsData = isOwner; }
+  void SetLighting(bool state) { mUsingLighting = state; };
+
   void SetPosition(GLfloat x, GLfloat y, GLfloat z);
   void SetRotation(GLfloat rx, GLfloat ry, GLfloat rz);
-
   void SetScale(GLfloat sx, GLfloat sy, GLfloat sz);
-  void SetLighting(bool state) { mUsingLighting = state; };
+
+  void SetPosition(const glm::vec3& pos);
+  void SetRotation(const glm::vec3& rot);
+  void SetScale(const glm::vec3& scale);
 
   inline OpenGLMatrix& GetModelMatrix() { return mModelMatrix; }
   inline glm::vec3& GetPosition() { return mPos; }
@@ -173,6 +177,25 @@ void Object::SetScale(GLfloat sx, GLfloat sy, GLfloat sz)
   mScale[0] = sx;
   mScale[1] = sy;
   mScale[2] = sz;
+}
+
+
+inline
+void Object::SetPosition(const glm::vec3& pos)
+{
+  mPos = pos;
+}
+
+inline
+void Object::SetRotation(const glm::vec3& rot)
+{
+  mRot = rot;
+}
+
+inline
+void Object::SetScale(const glm::vec3& scale)
+{
+  mScale = scale;
 }
 
 }  // namespace obj
