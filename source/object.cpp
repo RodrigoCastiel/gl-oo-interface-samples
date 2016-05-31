@@ -73,6 +73,78 @@ void Object::BuildUpGroup(std::vector<GLfloat>& groupPositions,
   mGroups.emplace_back(mesh, materialIndex, name);
 }
 
+// assimp loading method - works with any kind of 3d model file.
+bool Object::Load(const std::string& filePath, bool smoothNormals)
+{
+  // Load using Assimp::Importer.
+  Assimp::Importer importer;
+  aiPostProcessSteps postProcessNormal 
+      = smoothNormals ? aiProcess_GenSmoothNormals : aiProcess_GenNormals;
+
+  const aiScene* scene = importer.ReadFile(filePath.c_str(), 
+      aiProcess_Triangulate | postProcessNormal | aiProcess_FlipUVs);
+
+  // If successfully loaded into scene...
+  if (scene != nullptr)
+  {
+    // For each mesh, create a group.
+    for (int i = 0; i < scene->mNumMeshes; i++)
+    {
+      const aiMesh* mesh = scene->mMeshes[i];
+      std::vector<GLfloat> groupPositions;
+      std::vector<GLfloat> groupTexCoords;
+      std::vector<GLfloat> groupNormals;
+      std::vector<GLuint> groupIndices;
+
+      // Save vertices into temporary arrays.
+      for (int j = 0; j < mesh->mNumVertices; j++)
+      {
+        const aiVector3D* pos = &(mesh->mVertices[j]);
+        const aiVector3D* nor = mesh->HasNormals() ? &(mesh->mNormals[j]) : nullptr;
+        const aiVector3D* tex = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][j]) : nullptr;
+
+        groupPositions.push_back(pos->x);
+        groupPositions.push_back(pos->y);
+        groupPositions.push_back(pos->z);
+
+        if (nor)
+        {
+          groupNormals.push_back(nor->x);
+          groupNormals.push_back(nor->y);
+          groupNormals.push_back(nor->z);
+        }
+
+        if (tex)
+        {
+          groupTexCoords.push_back(tex->x);
+          groupTexCoords.push_back(tex->y);  
+        }
+      }
+
+      for (unsigned int j = 0 ; j < mesh->mNumFaces ; j++) 
+      {
+        const aiFace& face = mesh->mFaces[j];
+        groupIndices.push_back(face.mIndices[0]);
+        groupIndices.push_back(face.mIndices[1]);
+        groupIndices.push_back(face.mIndices[2]);
+      }
+
+      // At last, build the entire group.
+      Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, groupIndices,
+                           mesh->mName.C_Str(), mesh->mMaterialIndex);
+    }
+
+    // TODO: Initialize material list.
+
+    return true;
+  }
+  else
+  {
+    std::cerr << "ERROR Couldn't load scene/mesh at " << filePath << "\n" << importer.GetErrorString();
+    return false;
+  }
+}
+
 bool Object::LoadObjFile(const std::string& objFilePath, bool smoothNormals)
 {
   std::ifstream input(objFilePath, std::ios::in);
@@ -270,8 +342,10 @@ bool Object::LoadObjFile(const std::string& objFilePath, bool smoothNormals)
   return true;
 }
 
+// ==================== Parametric Surface Loading ====================== //
+
 bool Object::Load(std::function<glm::vec3 (float, float)> surf, 
-  int numSampleU, int numSampleV)
+  int numSampleU, int numSampleV, const glm::vec3& rgb)
 {
   int w = numSampleU;
   int h = numSampleV;
@@ -289,7 +363,9 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
   {
     for (int x = 0; x < w; x++)
     {
-      glm::vec3 surf_uv = surf(static_cast<float>(x)/(w-1), static_cast<float>(y)/(h-1));
+      float u = static_cast<float>(x)/(w-1);
+      float v = static_cast<float>(y)/(h-1);
+      glm::vec3 surf_uv = surf(u, v);
 
       // Positions x, y, z.
       vertices.push_back(surf_uv[0]);
@@ -297,9 +373,9 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
       vertices.push_back(surf_uv[2]);
 
       // Colors RGB.
-      vertices.push_back(0.6f);
-      vertices.push_back(0.6f);
-      vertices.push_back(0.6f);
+      vertices.push_back(rgb[0]);
+      vertices.push_back(rgb[1]);
+      vertices.push_back(rgb[2]);
     }
   }
 
@@ -338,80 +414,81 @@ bool Object::Load(std::function<glm::vec3 (float, float)> surf,
   return true;
 }
 
-// assimp loading method - works with any kind of 3d model file.
-bool Object::Load(const std::string& filePath, bool smoothNormals)
+bool Object::Load(std::function<glm::vec3 (float, float)> surf, 
+    int numSampleU, int numSampleV, std::function<glm::vec3 (float, float)> rgbFunc )
 {
-  // Load using Assimp::Importer.
-  Assimp::Importer importer;
-  aiPostProcessSteps postProcessNormal 
-      = smoothNormals ? aiProcess_GenSmoothNormals : aiProcess_GenNormals;
+  int w = numSampleU;
+  int h = numSampleV;
+  int numVertices = (w * h);
+  int numIndices  = (2 * w * h);
 
-  const aiScene* scene = importer.ReadFile(filePath.c_str(), 
-      aiProcess_Triangulate | postProcessNormal | aiProcess_FlipUVs);
+  std::vector<GLfloat> vertices;
+  std::vector<GLuint> indices; 
 
-  // If successfully loaded into scene...
-  if (scene != nullptr)
+  vertices.reserve(numVertices * 6);
+  indices.reserve(numIndices);
+
+  // Initialize vertices.
+  for (int y = 0; y < h; y++)
   {
-    // For each mesh, create a group.
-    for (int i = 0; i < scene->mNumMeshes; i++)
+    for (int x = 0; x < w; x++)
     {
-      const aiMesh* mesh = scene->mMeshes[i];
-      std::vector<GLfloat> groupPositions;
-      std::vector<GLfloat> groupTexCoords;
-      std::vector<GLfloat> groupNormals;
-      std::vector<GLuint> groupIndices;
+      float u = static_cast<float>(x)/(w-1);
+      float v = static_cast<float>(y)/(h-1);
 
-      // Save vertices into temporary arrays.
-      for (int j = 0; j < mesh->mNumVertices; j++)
-      {
-        const aiVector3D* pos = &(mesh->mVertices[j]);
-        const aiVector3D* nor = mesh->HasNormals() ? &(mesh->mNormals[j]) : nullptr;
-        const aiVector3D* tex = mesh->HasTextureCoords(0) ? &(mesh->mTextureCoords[0][j]) : nullptr;
+      glm::vec3 surf_uv = surf(u, v);
 
-        groupPositions.push_back(pos->x);
-        groupPositions.push_back(pos->y);
-        groupPositions.push_back(pos->z);
+      // Positions x, y, z.
+      vertices.push_back(surf_uv[0]);
+      vertices.push_back(surf_uv[1]);
+      vertices.push_back(surf_uv[2]);
 
-        if (nor)
-        {
-          groupNormals.push_back(nor->x);
-          groupNormals.push_back(nor->y);
-          groupNormals.push_back(nor->z);
-        }
-
-        if (tex)
-        {
-          groupTexCoords.push_back(tex->x);
-          groupTexCoords.push_back(tex->y);  
-        }
-      }
-
-      for (unsigned int j = 0 ; j < mesh->mNumFaces ; j++) {
-        const aiFace& face = mesh->mFaces[j];
-        groupIndices.push_back(face.mIndices[0]);
-        groupIndices.push_back(face.mIndices[1]);
-        groupIndices.push_back(face.mIndices[2]);
+      // Colors RGB.
+      const glm::vec3 rgb = rgbFunc(u, v);
+      vertices.push_back(rgb[0]);
+      vertices.push_back(rgb[1]);
+      vertices.push_back(rgb[2]);
     }
-
-      // At last, build the entire group.
-      Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, groupIndices,
-                           mesh->mName.C_Str(), mesh->mMaterialIndex);
-    }
-
-    // TODO: Initialize material list.
-
-    return true;
   }
-  else
+
+  // Initialize indices.
+  // Wire frame Element array - indices are written in a zig-zag pattern,
+  // first horizontally and then vertically. It uses GL_LINE_STRIP. 
+  int index = 0;
+  int x = 0, y = 0;
+  int dx = 1, dy = -1;
+
+  for (y = 0; y < h; y++)  // Horizontally.
   {
-    std::cerr << "ERROR Couldn't load scene/mesh at " << filePath << "\n" << importer.GetErrorString();
-    return false;
+    x = ((dx == 1) ? 0 : w-1);
+    for (int k = 0; k < w; k++, x += dx)
+      indices.push_back(INDEX(x, y));
+    dx *= -1;
   }
+
+  // Start from the last point to allow continuity in GL_LINE_STRIP.
+  x = ((dx == 1) ? 0 : w-1);
+  y = h-1;  
+  dy = -1;
+  for (int i = 0; i < w; i++, x += dx)  // Vertically.
+  {
+    y = ((dy == 1) ? 0 : h-1);
+    for (int j = 0; j < h; j++, y += dy)
+      indices.push_back(INDEX(x, y));
+    dy *= -1;
+  }
+
+  Mesh* mesh = new Mesh(mProgramHandle);
+  mesh->Load(&vertices[0], &indices[0], numVertices, numIndices, true, false, false, GL_LINE_STRIP);
+  mUsingLighting = false;
+  mGroups.emplace_back(mesh, 0, "Main surface");
+
+  return true;
 }
 
-// ================= Intersect Ray =============== //
+// ================= Ray Intersection =============== //
 
-bool Object::IntersectRay(const glm::vec3& ray, const glm::vec3& C) const
+bool Object::RayIntersection(const glm::vec3& ray, const glm::vec3& C) const
 {
   // TODO: walk through triangle array and compute intersection.
   return true;

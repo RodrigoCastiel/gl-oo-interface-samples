@@ -28,6 +28,11 @@ void SampleProgram::InitScene(int argc, char *argv[])
       );
   };
 
+  auto mobiusColor = [](float u, float v)
+  {
+    return glm::vec3(u/2 + 0.5, v/2 + 0.5, 1 - u/4 - v/4);
+  };
+
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LINE_SMOOTH);
@@ -38,8 +43,9 @@ void SampleProgram::InitScene(int argc, char *argv[])
   blah = new obj::Object(mPipelineProgram, mProgramHandle);
   //blah->SetRotation(-M_PI/2, 0, 0);
   //blah->SetScale(0.01, 0.01, 0.01);
-  blah->Load("./objs/B-747.obj", true);
+  //blah->Load("./objs/B-747.obj", true);
   //blah->LoadObjFile("./objs/dragon-77k.obj");
+  blah->Load(mobius, 50, 50, mobiusColor);
 
   // Insert new objects here!!
   AxisObject* originAxis = new AxisObject(mPipelineProgram, mProgramHandle);
