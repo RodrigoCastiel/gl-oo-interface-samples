@@ -19,7 +19,31 @@ namespace gloo
 namespace obj
 {
 
-// ================== Material ================================================================= //
+// ================== Material and Texture ===================================================== //
+
+struct Texture
+{
+  GLuint mBuffer { 0 };            // Texture buffer object ID.
+  GLenum mSlot   { GL_TEXTURE0 };  // Texture slot (when multiple textures are used).
+  
+  inline bool Valid() { return (mBuffer != 0); }
+
+  inline void Bind(GLuint programHandle) 
+  { 
+    glActiveTexture(mSlot);  // TODO: double-check functionality.
+    glBindTexture(GL_TEXTURE_2D, mBuffer); 
+  }
+ 
+  // TODO: Implement following methods.
+  // Allocates uninitializaed buffer for texture.
+  void Load(int width, int height);
+
+  // Loads from ImageIO class.
+  void Load(ImageIO* source);
+
+  // Loads from file (typically .JPEG) .
+  bool Load(const std::string& filePath);
+};
 
 struct Material
 {

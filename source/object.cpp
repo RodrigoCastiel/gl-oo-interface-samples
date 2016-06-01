@@ -31,10 +31,9 @@ void Object::Render() const
   glUniform1i(lightOnLoc, mUsingLighting);
   glUniform1i(matLoc, 1);
   glUniform3f(locKa, 0.1f, 0.1f, 0.1f);
-  glUniform3f(locKd, 0.5f, 0.0f, 0.0f);
+  glUniform3f(locKd, 0.2f, 0.6f, 0.6f);
   glUniform3f(locKs, 0.01f, 0.01f, 0.01f);
   glUniform1i(texLoc, 0);
-
 
   mModelMatrix.LoadIdentity();
   mModelMatrix.Translate(mPos[0], mPos[1], mPos[2]);
@@ -47,6 +46,7 @@ void Object::Render() const
 
   for (auto& group : mGroups)
   {
+    // TODO: set material per group.
     group.mesh->Render();
   }
 }

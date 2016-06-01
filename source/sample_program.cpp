@@ -43,9 +43,9 @@ void SampleProgram::InitScene(int argc, char *argv[])
   blah = new obj::Object(mPipelineProgram, mProgramHandle);
   //blah->SetRotation(-M_PI/2, 0, 0);
   //blah->SetScale(0.01, 0.01, 0.01);
-  //blah->Load("./objs/B-747.obj", true);
+  blah->LoadFile("./objs/B-747.obj", true);
   //blah->LoadObjFile("./objs/dragon-77k.obj");
-  blah->LoadParametricSurf(mobius, mobiusColor, 50, 50, false);
+  //blah->LoadParametricSurf(mobius, mobiusColor, 50, 50, false);
 
   // Insert new objects here!!
   AxisObject* originAxis = new AxisObject(mPipelineProgram, mProgramHandle);
