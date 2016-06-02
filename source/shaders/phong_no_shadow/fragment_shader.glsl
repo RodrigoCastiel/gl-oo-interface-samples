@@ -25,9 +25,10 @@ in vec4 f_pos;
 out vec4 c;
 
 // Uniforms.
-uniform int tex_on;
-uniform int light_on;
-uniform int material_on;
+uniform int tex_on;         // Tells if texture is active.
+uniform int light_on;       // Tells if lighting is active.
+uniform int material_on;    // Tells if current frag has a material.
+uniform int invalid_tex;    // Tells if texture is invalid - special rendering.
 
 uniform int numLights;
 uniform Light light[8];
@@ -39,13 +40,24 @@ void main()
 {
   if (light_on == 1)
   {
-    vec3 Kd = material_on*material.Kd + (1-material_on)*vec3(1, 1, 1);
-    vec3 Ka = material_on*material.Ka;
-    vec3 Ks = material_on*material.Ks;
-    
+    vec3 Kd, Ka, Ks;
+
+    if (invalid_tex == 0)  // Special case - render magent instead of invalid texture.
+    {
+      Kd = vec3(1.0, 0.0, 1.0);
+      Ka = vec3(0.1, 0.1, 0.1);
+      Ks = vec3(0.0, 0.0, 0.0);
+    }
+    else
+    {
+      Kd = material_on*material.Kd + (1-material_on)*vec3(1, 1, 1);
+      Ka = material_on*material.Ka;
+      Ks = material_on*material.Ks;
+    }
+
     // Note: since f_pos is in camera coordinates, the incident ray is simply f_pos.xyz.
     vec3 n = normalize(v_normal);
-    vec3 r = reflect(f_pos.xyz, n);                  // Compute reflection for camera ray.
+    vec3 r = reflect(f_pos.xyz, n);  // Compute reflection for camera ray.
     
     vec3 Id = vec3(0);
     vec3 Ia = vec3(0);
@@ -62,7 +74,6 @@ void main()
       Is += Ks * (light[i].Ls * pow(max(dot(l, r), 0.0), /* alpha = */ 1.0f));
     }
 
-    //c = color * (Ia + Id + Is) * dot(light[i].normal, l);  // (Spotlight).
     vec4 color = (1-tex_on)*vec4(1) + (tex_on)*texture(tex, v_tex_coord);
     c = color * vec4((Ia + Id + Is), 1.0);
   }
