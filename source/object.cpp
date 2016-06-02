@@ -145,203 +145,6 @@ bool Object::LoadFile(const std::string& filePath, bool smoothNormals)
   }
 }
 
-bool Object::LoadObjFile(const std::string& objFilePath, bool smoothNormals)
-{
-  std::ifstream input(objFilePath, std::ios::in);
-
-  if (!input.is_open())
-  {
-    std::cerr << "ERROR Couldn't load the .obj file at " << objFilePath << ".\n";
-    return false;
-  }
-
-  std::string line, name;
-
-  const int kNumIndices = 100;
-  std::vector<GLfloat> positions;  // List of all positions (x, y, z).
-  std::vector<GLfloat> texCoords;  // List of all texture (u, v).
-  std::vector<GLfloat> normals;    // List of all normals (nx, ny, nz).
-
-  std::vector<GLfloat> groupPositions;  // List of current group positions.
-  std::vector<GLfloat> groupTexCoords;  // List of current group tex coords.
-  std::vector<GLfloat> groupNormals;    // List of current group normals.
-  std::vector<GLuint> groupIndices;
-
-  bool buildingGroup = false;
-  int currentLine = 0;
-
-  // Parse each line.
-  while (std::getline(input, line))
-  {
-    line = tool::RemoveRepeatedCharacters(line, ' ');
-
-    // New group.
-    if (line.substr(0, 2) == "g ")
-    {
-      if (buildingGroup)  // Finish storing previous group.
-      {
-        Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, 
-                             groupIndices, name.c_str());
-        groupPositions = std::vector<GLfloat>();
-        groupTexCoords = std::vector<GLfloat>();
-        groupNormals   = std::vector<GLfloat>();
-      }
-      else
-      {
-        buildingGroup = true;
-      }
-
-      std::istringstream v(line.substr(2));
-      v >> name;  // Read group name (it can be void).
-    }
-    // New vertex.
-    else if (line.substr(0, 2) == "v ")
-    {
-      std::istringstream v(line.substr(2));
-      float x, y, z;
-
-      // Read three coordinates.
-      v >> x >> y >> z;
-      
-      if (!v.fail())
-      {
-        positions.push_back(x);
-        positions.push_back(y);
-        positions.push_back(z);
-      }
-      else
-      {
-        std::cerr << "ERROR [.obj Parsing] Expected vertex coordinates (3)." << std::endl;
-        return false;
-      }
-    }
-    // New texture coordinates (u, v).
-    else if (line.substr(0, 3) == "vt ")
-    {
-      std::istringstream v(line.substr(3));
-      float x, y;
-
-      // Read two coordinates.
-      v >> x >> y;
-
-      if (!v.fail())
-      {
-        texCoords.push_back(x);
-        texCoords.push_back(y);
-      }
-      else
-      {
-        std::cerr << "ERROR [.obj Parsing] Expected uv texture coordinates (2)." << std::endl;
-        return false;
-      }
-        
-    }
-    // New normal.
-    else if (line.substr(0, 3) == "vn ")
-    {
-      std::istringstream v(line.substr(2));
-      float x, y, z;
-
-      // Read three coordinates.
-      v >> x >> y >> z;
-      
-      if (!v.fail())
-      {
-        normals.push_back(x);
-        normals.push_back(y);
-        normals.push_back(z);
-      }
-      else
-      {
-        std::cerr << "ERROR [.obj Parsing] Expected normal components (3)." << std::endl;
-        return false;
-      }
-
-    }
-    // New face.
-    else if (line.substr(0, 2) == "f ")
-    {
-      std::vector<std::string> tokens = tool::SplitString(line, std::vector<std::string>({" ", "\r", "\n"}));
-      std::vector<glm::vec3> faceVertices;
-      int currentVertex = 0;
-
-      // Read remaining tokens (exclude "f")/
-      for (int i = 1; i < tokens.size(); i++)
-      {
-        std::vector<std::string> indices_single = tool::SplitString(tokens[i], "/");
-        std::vector<std::string> indices_double = tool::SplitString(tokens[i], "//");
-
-        if (indices_double.size() > 1)  // No texture coordinates (v // n).
-        {
-          //std::cout << indices_double[0] << "//" << indices_double[1] << " ";
-
-          int i_v = std::stoi(indices_double[0]) - 1;
-          int i_n = std::stoi(indices_double[1]) - 1;
-
-          faceVertices.push_back(glm::make_vec3(&positions[3*i_v]));
-          groupPositions.push_back(positions[3*i_v + 0]);
-          groupPositions.push_back(positions[3*i_v + 1]);
-          groupPositions.push_back(positions[3*i_v + 2]);
-
-          groupNormals.push_back(normals[3*i_n + 0]);
-          groupNormals.push_back(normals[3*i_n + 1]);
-          groupNormals.push_back(normals[3*i_n + 2]);        
-
-        }
-        else if ((indices_single.size() == 1) 
-              && (indices_double.size() == 1))  // No texture coordinates and no normals (v / t / n).
-        {
-          // int i_v = std::stoi(indices_double[0]) - 1;
-
-          // groupPositions.push_back(positions[3*i_v + 0]);
-          // groupPositions.push_back(positions[3*i_v + 1]);
-          // groupPositions.push_back(positions[3*i_v + 2]);
-        }
-        else  // v
-        {
-          //std::cout << indices_single[0] << "/" << indices_single[1] << "/" << indices_single[2] << " ";
-          int i_v = std::stoi(indices_single[0]) - 1;
-          int i_t = std::stoi(indices_single[1]) - 1;
-          int i_n = std::stoi(indices_single[2]) - 1;
-
-          faceVertices.push_back(glm::make_vec3(&positions[3*i_v]));
-          groupPositions.push_back(positions[3*i_v + 0]);
-          groupPositions.push_back(positions[3*i_v + 1]);
-          groupPositions.push_back(positions[3*i_v + 2]);
-
-          groupTexCoords.push_back(texCoords[2*i_t + 0]);
-          groupTexCoords.push_back(texCoords[2*i_t + 1]);
-
-          groupNormals.push_back(normals[3*i_n + 0]);
-          groupNormals.push_back(normals[3*i_n + 1]);
-          groupNormals.push_back(normals[3*i_n + 2]);
-        }
-
-        currentVertex++;
-      }
-
-      if (!smoothNormals)
-      {
-        // Compute normal per triangle.
-        glm::vec3 n = tool::TriangleNormal(faceVertices[0], faceVertices[1], faceVertices[2]);
-        // groupNormals.push_back(n[0]);
-        // groupNormals.push_back(n[1]);
-        // groupNormals.push_back(n[2]);
-      }
-
-    }
-    // ADD MORE OPTIONS AND COMMANDS HERE.
-    else
-    {
-      // Ignore everything else.
-    }
-  }
-
-  Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, groupIndices, name.c_str());
-
-  return true;
-}
-
 // ==================== Parametric Surface Loading ====================== //
 
 
@@ -550,6 +353,206 @@ bool Texture::Load(const std::string& filePath, GLenum slot)
 
   delete source;
   return successful;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// TO REVIEW - SIMPLE .OBJ LOADER
+
+bool Object::LoadObjFile(const std::string& objFilePath, bool smoothNormals)
+{
+  std::ifstream input(objFilePath, std::ios::in);
+
+  if (!input.is_open())
+  {
+    std::cerr << "ERROR Couldn't load the .obj file at " << objFilePath << ".\n";
+    return false;
+  }
+
+  std::string line, name;
+
+  const int kNumIndices = 100;
+  std::vector<GLfloat> positions;  // List of all positions (x, y, z).
+  std::vector<GLfloat> texCoords;  // List of all texture (u, v).
+  std::vector<GLfloat> normals;    // List of all normals (nx, ny, nz).
+
+  std::vector<GLfloat> groupPositions;  // List of current group positions.
+  std::vector<GLfloat> groupTexCoords;  // List of current group tex coords.
+  std::vector<GLfloat> groupNormals;    // List of current group normals.
+  std::vector<GLuint> groupIndices;
+
+  bool buildingGroup = false;
+  int currentLine = 0;
+
+  // Parse each line.
+  while (std::getline(input, line))
+  {
+    line = tool::RemoveRepeatedCharacters(line, ' ');
+
+    // New group.
+    if (line.substr(0, 2) == "g ")
+    {
+      if (buildingGroup)  // Finish storing previous group.
+      {
+        Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, 
+                             groupIndices, name.c_str());
+        groupPositions = std::vector<GLfloat>();
+        groupTexCoords = std::vector<GLfloat>();
+        groupNormals   = std::vector<GLfloat>();
+      }
+      else
+      {
+        buildingGroup = true;
+      }
+
+      std::istringstream v(line.substr(2));
+      v >> name;  // Read group name (it can be void).
+    }
+    // New vertex.
+    else if (line.substr(0, 2) == "v ")
+    {
+      std::istringstream v(line.substr(2));
+      float x, y, z;
+
+      // Read three coordinates.
+      v >> x >> y >> z;
+      
+      if (!v.fail())
+      {
+        positions.push_back(x);
+        positions.push_back(y);
+        positions.push_back(z);
+      }
+      else
+      {
+        std::cerr << "ERROR [.obj Parsing] Expected vertex coordinates (3)." << std::endl;
+        return false;
+      }
+    }
+    // New texture coordinates (u, v).
+    else if (line.substr(0, 3) == "vt ")
+    {
+      std::istringstream v(line.substr(3));
+      float x, y;
+
+      // Read two coordinates.
+      v >> x >> y;
+
+      if (!v.fail())
+      {
+        texCoords.push_back(x);
+        texCoords.push_back(y);
+      }
+      else
+      {
+        std::cerr << "ERROR [.obj Parsing] Expected uv texture coordinates (2)." << std::endl;
+        return false;
+      }
+        
+    }
+    // New normal.
+    else if (line.substr(0, 3) == "vn ")
+    {
+      std::istringstream v(line.substr(2));
+      float x, y, z;
+
+      // Read three coordinates.
+      v >> x >> y >> z;
+      
+      if (!v.fail())
+      {
+        normals.push_back(x);
+        normals.push_back(y);
+        normals.push_back(z);
+      }
+      else
+      {
+        std::cerr << "ERROR [.obj Parsing] Expected normal components (3)." << std::endl;
+        return false;
+      }
+
+    }
+    // New face.
+    else if (line.substr(0, 2) == "f ")
+    {
+      std::vector<std::string> tokens = tool::SplitString(line, std::vector<std::string>({" ", "\r", "\n"}));
+      std::vector<glm::vec3> faceVertices;
+      int currentVertex = 0;
+
+      // Read remaining tokens (exclude "f")/
+      for (int i = 1; i < tokens.size(); i++)
+      {
+        std::vector<std::string> indices_single = tool::SplitString(tokens[i], "/");
+        std::vector<std::string> indices_double = tool::SplitString(tokens[i], "//");
+
+        if (indices_double.size() > 1)  // No texture coordinates (v // n).
+        {
+          //std::cout << indices_double[0] << "//" << indices_double[1] << " ";
+
+          int i_v = std::stoi(indices_double[0]) - 1;
+          int i_n = std::stoi(indices_double[1]) - 1;
+
+          faceVertices.push_back(glm::make_vec3(&positions[3*i_v]));
+          groupPositions.push_back(positions[3*i_v + 0]);
+          groupPositions.push_back(positions[3*i_v + 1]);
+          groupPositions.push_back(positions[3*i_v + 2]);
+
+          groupNormals.push_back(normals[3*i_n + 0]);
+          groupNormals.push_back(normals[3*i_n + 1]);
+          groupNormals.push_back(normals[3*i_n + 2]);        
+
+        }
+        else if ((indices_single.size() == 1) 
+              && (indices_double.size() == 1))  // No texture coordinates and no normals (v / t / n).
+        {
+          // int i_v = std::stoi(indices_double[0]) - 1;
+
+          // groupPositions.push_back(positions[3*i_v + 0]);
+          // groupPositions.push_back(positions[3*i_v + 1]);
+          // groupPositions.push_back(positions[3*i_v + 2]);
+        }
+        else  // v
+        {
+          //std::cout << indices_single[0] << "/" << indices_single[1] << "/" << indices_single[2] << " ";
+          int i_v = std::stoi(indices_single[0]) - 1;
+          int i_t = std::stoi(indices_single[1]) - 1;
+          int i_n = std::stoi(indices_single[2]) - 1;
+
+          faceVertices.push_back(glm::make_vec3(&positions[3*i_v]));
+          groupPositions.push_back(positions[3*i_v + 0]);
+          groupPositions.push_back(positions[3*i_v + 1]);
+          groupPositions.push_back(positions[3*i_v + 2]);
+
+          groupTexCoords.push_back(texCoords[2*i_t + 0]);
+          groupTexCoords.push_back(texCoords[2*i_t + 1]);
+
+          groupNormals.push_back(normals[3*i_n + 0]);
+          groupNormals.push_back(normals[3*i_n + 1]);
+          groupNormals.push_back(normals[3*i_n + 2]);
+        }
+
+        currentVertex++;
+      }
+
+      if (!smoothNormals)
+      {
+        // Compute normal per triangle.
+        glm::vec3 n = tool::TriangleNormal(faceVertices[0], faceVertices[1], faceVertices[2]);
+        // groupNormals.push_back(n[0]);
+        // groupNormals.push_back(n[1]);
+        // groupNormals.push_back(n[2]);
+      }
+
+    }
+    // ADD MORE OPTIONS AND COMMANDS HERE.
+    else
+    {
+      // Ignore everything else.
+    }
+  }
+
+  Object::BuildUpGroup(groupPositions, groupTexCoords, groupNormals, groupIndices, name.c_str());
+
+  return true;
 }
 
 
