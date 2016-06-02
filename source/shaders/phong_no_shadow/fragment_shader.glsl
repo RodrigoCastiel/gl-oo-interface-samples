@@ -42,7 +42,7 @@ void main()
   {
     vec3 Kd, Ka, Ks;
 
-    if (invalid_tex == 0)  // Special case - render magent instead of invalid texture.
+    if (invalid_tex == 1)  // Special case - render magent instead of invalid texture.
     {
       Kd = vec3(1.0, 0.0, 1.0);
       Ka = vec3(0.1, 0.1, 0.1);
