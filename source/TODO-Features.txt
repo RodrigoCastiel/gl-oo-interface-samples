@@ -8,7 +8,7 @@ MAIN: Fully integrate assimp to the library;
 1. Provide basic objects, such as spheres tetrahedron, rectangles with texture and so on;
 2. Take object out from namespace obj;
 3. Provide wireframe mesh to any object (like a copy);
-4.  
+4. Add options for texture filetering and so on + MIPMAP;
 
 -- Scene --
 1. Allow multiple objects;

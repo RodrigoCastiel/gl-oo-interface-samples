@@ -474,6 +474,91 @@ Object::~Object()
   }
 }
 
+// ============ Texture Load Methods ============= //
+void Texture::Load(int width, int height, GLenum slot)
+{
+  if (mBuffer != 0)
+  {
+    glDeleteTextures(1, &mBuffer);
+  }
+
+  glGenTextures(1, &mBuffer);
+  glActiveTexture(slot);
+  glBindTexture(GL_TEXTURE_2D, mBuffer);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  glTexImage2D( GL_TEXTURE_2D,  // Target.
+                0,              // Detail level - original.
+                GL_RGB,         // How the colors are stored.
+                width,   // Width.
+                height,  // Height.
+                0,                    // Border must be 0. 
+                GL_RGB,               // Format (?).  
+                GL_UNSIGNED_BYTE,        // Data type.
+                nullptr                  // Buffer address.
+  );
+}
+
+void Texture::Load(ImageIO* source, GLenum slot)
+{
+  if (mBuffer != 0)  // There was a texture previously loaded.
+  {
+    glDeleteTextures(1, &mBuffer);
+  }
+
+  glGenTextures(1, &mBuffer);
+  glActiveTexture(slot);
+  glBindTexture(GL_TEXTURE_2D, mBuffer);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  int bytesPerPixel = source->getBytesPerPixel();
+
+  glTexImage2D( GL_TEXTURE_2D,  // Target.
+                0,              // Detail level - original.
+                GL_RGB,  // How the colors are stored.
+                source->getWidth(),   // Width.
+                source->getHeight(),  // Height.
+                0,                    // Border must be 0. 
+                GL_RGB,  // Format (?).  
+                GL_UNSIGNED_BYTE,               // Data type.
+                source->getPixels()             // Buffer address.
+  );
+
+}
+
+bool Texture::Load(const std::string& filePath, GLenum slot)
+{
+  bool successful = false;
+  ImageIO* source = new ImageIO();
+  if (source->loadJPEG(filePath.c_str()) == ImageIO::OK)
+  {
+    Texture::Load(source, slot);
+    successful = true;
+  }
+  else
+  {
+    std::cerr << "WARNING Texture file in " << filePath << " could not be loaded.\n";
+  }
+
+  delete source;
+  return successful;
+}
+
+
 }  // namespace obj
 
 }  // namespace gloo
+
+
+
+
+
+
