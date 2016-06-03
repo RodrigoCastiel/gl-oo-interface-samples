@@ -1,0 +1,9 @@
+
+-----------------------------------------------------------------------------------
+1. Parametric surfaces with solid materials + normal computation (using gradient).
+2. Material list implementation.
+3. Textured parametric surface.
+4. Basic object library with new class Object.
+5. Remove old SceneObject implementation.
+6. Method for creating wireframe meshes from meshes (also objects from objects). 
+-----------------------------------------------------------------------------------
