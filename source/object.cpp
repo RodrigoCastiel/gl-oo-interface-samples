@@ -253,6 +253,75 @@ bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf,
   return true;
 }
 
+bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf, 
+                                std::function<glm::vec3 (float, float)> normal,
+                                std::function<glm::vec3 (float, float)> rgbFunc,
+                                int numSampleU, int numSampleV)
+{
+  int w = numSampleU;
+  int h = numSampleV;
+  int numVertices = (w * h);
+  int numIndices  = 2*(h-2)*w + 2*w + 2*(h-2);
+  GLenum drawMode = GL_TRIANGLE_STRIP;
+
+  std::vector<GLfloat> vertices;
+  std::vector<GLuint> indices;
+
+  vertices.reserve(numVertices * 6);
+  indices.reserve(numIndices);
+
+  // Initialize vertices.
+  for (int y = 0; y < h; y++)
+  {
+    for (int x = 0; x < w; x++)
+    {
+      float u = static_cast<float>(x)/(w-1);
+      float v = static_cast<float>(y)/(h-1);
+
+      glm::vec3 surf_uv = surf(u, v);
+      glm::vec3 nor     = normal(u, v);
+
+      // Positions x, y, z.
+      vertices.push_back(surf_uv[0]);
+      vertices.push_back(surf_uv[1]);
+      vertices.push_back(surf_uv[2]);
+
+      // Normals.
+      vertices.push_back(nor[0]);
+      vertices.push_back(nor[1]);
+      vertices.push_back(nor[2]);
+    }
+  }
+
+  
+  // Initialize indices.
+  for (int v = 0; v < h-1; v++)
+  {
+    // Zig-zag pattern: alternate between top and bottom.
+    for (int u = 0; u < w; u++)
+    {
+      indices.push_back((v+0)*w + u);
+      indices.push_back((v+1)*w + u);
+    }
+
+    // Triangle row transition: handle discontinuity.
+    if (v < h-2)
+    {
+      // Repeat last vertex and the next row first vertex to generate 
+      // two invalid triangles and get continuity in the mesh.
+      indices.push_back((v+1)*w + (w-1)); //INDEX(this->width-1, y+1);
+      indices.push_back((v+1)*w + 0);     //INDEX(0, y+1);
+    }
+  }
+
+  Mesh* mesh = new Mesh(mProgramHandle);
+  mesh->Load(&vertices[0], &indices[0], numVertices, numIndices, false, true, false, drawMode);
+  mUsingLighting = true;
+  mGroups.emplace_back(mesh, 0, "Main surface");
+
+  return true;
+}
+
 // ================= Ray Intersection =============== //
 
 bool Object::RayIntersection(const glm::vec3& ray, const glm::vec3& C) const

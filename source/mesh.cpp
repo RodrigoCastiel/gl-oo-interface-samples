@@ -119,7 +119,7 @@ bool Mesh::Load(const GLfloat* positions,
 
 bool Mesh::Load(const GLfloat* vertices, const GLuint* indices, 
                 int numVertices,         int numIndices, 
-                bool hasColors,          bool hasNormals, 
+                bool hasColors,          bool hasNormals,
                 bool hasTexCoord,        GLenum drawMode
               )
 {
