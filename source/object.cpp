@@ -253,10 +253,9 @@ bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf,
   return true;
 }
 
-bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf, 
-                                std::function<glm::vec3 (float, float)> normal,
-                                std::function<glm::vec3 (float, float)> rgbFunc,
-                                int numSampleU, int numSampleV)
+bool Object::LoadParametricSurfSolid( std::function<glm::vec3 (float, float)> surf, 
+                                      std::function<glm::vec3 (float, float)> normal,
+                                      int numSampleU, int numSampleV)
 {
   int w = numSampleU;
   int h = numSampleV;
@@ -277,9 +276,8 @@ bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf,
     {
       float u = static_cast<float>(x)/(w-1);
       float v = static_cast<float>(y)/(h-1);
-
       glm::vec3 surf_uv = surf(u, v);
-      glm::vec3 nor     = normal(u, v);
+      glm::vec3 nor = normal(u, v);
 
       // Positions x, y, z.
       vertices.push_back(surf_uv[0]);
@@ -292,7 +290,6 @@ bool Object::LoadParametricSurf(std::function<glm::vec3 (float, float)> surf,
       vertices.push_back(nor[2]);
     }
   }
-
   
   // Initialize indices.
   for (int v = 0; v < h-1; v++)

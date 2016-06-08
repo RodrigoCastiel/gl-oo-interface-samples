@@ -116,17 +116,16 @@ public:
   // WIREFRAME - variable color according to rgb lambda function.
   bool LoadParametricSurf(std::function<glm::vec3 (float, float)> surf, 
                           std::function<glm::vec3 (float, float)> rgbFunc, 
-                          int numSampleU, int numSampleV, bool solid = false);
+                          int numSampleU, int numSampleV, bool solid);
 
   // Loads its mesh from a parametric surface, surf : R^2 -> R^3.
   // Parameterization must be normalized from 0 to 1.
   // The normal must be provided.
   // numSampleU and numSampleV detail how many samples of u, v are taken.
   // SOLID.
-  bool LoadParametricSurf(std::function<glm::vec3 (float, float)> surf, 
-                          std::function<glm::vec3 (float, float)> normal,
-                          std::function<glm::vec3 (float, float)> rgbFunc,
-                          int numSampleU, int numSampleV);
+  bool LoadParametricSurfSolid(std::function<glm::vec3 (float, float)> surf, 
+                               std::function<glm::vec3 (float, float)> normal,
+                               int numSampleU, int numSampleV);
 
   // TODO: Add primitive loading method here.
 
